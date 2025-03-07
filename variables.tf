@@ -45,3 +45,21 @@ variable "dynamodb_table_name" {
   type        = string
   default     = "terraform-lock-table"
 }
+
+variable "backend_bucket_name" {
+  description = "S3 bucket for storing Terraform state"
+  type        = string
+  default     = "my-terraform-state-bucket-12345"
+}
+
+variable "dynamodb_table_name" {
+  description = "DynamoDB table for state locking"
+  type        = string
+  default     = "terraform-lock-table"
+}
+
+variable "enable_rds" {
+  description = "Enable RDS database instance"
+  type        = bool
+  default     = true
+}
