@@ -77,3 +77,19 @@ resource "aws_iam_role_policy_attachment" "terraform_policy_attach" {
   role       = aws_iam_role.terraform_role.name
   policy_arn = aws_iam_policy.terraform_policy.arn
 }
+
+resource "aws_iam_policy" "deny_secrets_access" {
+  name        = "DenySecretsAccess"
+  description = "Prevents access to Terraform-managed secrets"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Deny"
+        Action = "secretsmanager:GetSecretValue"
+        Resource = aws_secretsmanager_secret.db_credentials.arn
+      }
+    ]
+  })
+}
