@@ -33,3 +33,15 @@ variable "s3_bucket_name" {
   type        = string
   default     = "my-terraform-bucket-unique-name"
 }
+
+variable "backend_bucket_name" {
+  description = "S3 bucket for storing Terraform state"
+  type        = string
+  default     = "my-terraform-state-bucket-12345"
+}
+
+variable "dynamodb_table_name" {
+  description = "DynamoDB table for state locking"
+  type        = string
+  default     = "terraform-lock-table"
+}
