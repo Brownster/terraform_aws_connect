@@ -1,17 +1,14 @@
-resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr
-  tags = {
-    Name = "MainVPC"
-  }
-}
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.19.0"
 
-resource "aws_subnet" "subnet" {
-  count             = length(var.subnet_cidrs)
-  vpc_id           = aws_vpc.main.id
-  cidr_block       = var.subnet_cidrs[count.index]
-  availability_zone = element(["us-east-1a", "us-east-1b"], count.index)
-}
+  name = "my-vpc"
+  cidr = var.vpc_cidr
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
+  azs             = ["us-east-1a", "us-east-1b"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
+
+  enable_nat_gateway = true
+  enable_vpn_gateway = false
 }
