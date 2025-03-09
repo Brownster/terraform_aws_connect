@@ -1,37 +1,19 @@
-resource "aws_s3_bucket" "bucket" {
-  bucket = var.s3_bucket_name
-}
+module "s3_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "3.15.0"
 
-resource "aws_s3_bucket_public_access_block" "bucket_access" {
-  bucket = aws_s3_bucket.bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
+  bucket = var.backend_bucket_name
+  acl    = "private"
 
-resource "aws_s3_bucket_policy" "terraform_state_policy" {
-  bucket = aws_s3_bucket.terraform_state.id
+  versioning = {
+    enabled = true
+  }
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowTerraformOnly"
-        Effect    = "Deny"
-        Principal = "*"
-        Action    = "s3:*"
-        Resource  = [
-          "arn:aws:s3:::${var.backend_bucket_name}",
-          "arn:aws:s3:::${var.backend_bucket_name}/*"
-        ]
-        Condition = {
-          StringNotEquals = {
-            "aws:PrincipalArn" = aws_iam_role.terraform_role.arn
-          }
-        }
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "aws:kms"
       }
-    ]
-  })
+    }
+  }
 }
-
