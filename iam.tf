@@ -1,95 +1,15 @@
-resource "aws_iam_role" "terraform_role" {
-  name = "TerraformExecutionRole"
+module "iam_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.4.0"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
+  role_name = "TerraformExecutionRole"
 
-resource "aws_iam_policy" "terraform_policy" {
-  name        = "TerraformPolicy"
-  description = "Permissions for Terraform to manage infrastructure"
-  
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+  trusted_role_services = [
+    "ec2.amazonaws.com"
+  ]
 
-      # S3 Access for Terraform State
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          "arn:aws:s3:::${var.backend_bucket_name}",
-          "arn:aws:s3:::${var.backend_bucket_name}/*"
-        ]
-      },
-
-      # DynamoDB for State Locking
-      {
-        Effect = "Allow"
-        Action = [
-          "dynamodb:PutItem",
-          "dynamodb:GetItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:Scan"
-        ]
-        Resource = "arn:aws:dynamodb:${var.aws_region}:*:table/${var.dynamodb_table_name}"
-      },
-
-      # Secrets Manager Access (Read Only)
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ]
-        Resource = aws_secretsmanager_secret.db_credentials.arn
-      },
-
-      # Limit Terraform's ability to create infrastructure
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:*",
-          "rds:*",
-          "s3:*",
-          "iam:PassRole"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "terraform_policy_attach" {
-  role       = aws_iam_role.terraform_role.name
-  policy_arn = aws_iam_policy.terraform_policy.arn
-}
-
-resource "aws_iam_policy" "deny_secrets_access" {
-  name        = "DenySecretsAccess"
-  description = "Prevents access to Terraform-managed secrets"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Deny"
-        Action = "secretsmanager:GetSecretValue"
-        Resource = aws_secretsmanager_secret.db_credentials.arn
-      }
-    ]
-  })
+  create_policy = true
+  policies = {
+    "s3_access" = aws_iam_policy.terraform_policy.arn
+  }
 }
