@@ -1,0 +1,30 @@
+{
+    "Version": "2019-10-30",
+    "StartAction": "Menu",
+    "Actions": [
+      {
+        "Type": "PlayPrompt",
+        "Parameters": {
+          "Text": "Welcome to our call center. Press 1 for Sales, 2 for Support, 3 for Billing."
+        }
+      },
+      {
+        "Type": "Menu",
+        "Branches": {
+          "1": {
+            "Action": "TransferToQueue",
+            "Parameters": { "Queue": "Sales Queue" }
+          },
+          "2": {
+            "Action": "TransferToQueue",
+            "Parameters": { "Queue": "Support Queue" }
+          },
+          "3": {
+            "Action": "TransferToQueue",
+            "Parameters": { "Queue": "Billing Queue" }
+          }
+        }
+      }
+    ]
+  }
+  

@@ -1,0 +1,15 @@
+{
+    "Version": "2019-10-30",
+    "StartAction": "SetRecordingBehavior",
+    "Actions": [
+      {
+        "Type": "SetRecordingBehavior",
+        "Parameters": {
+          "Recording": "Enable",
+          "Destination": "S3",
+          "S3Bucket": "aws-connect-call-recordings-${customer_id}"
+        }
+      }
+    ]
+  }
+  

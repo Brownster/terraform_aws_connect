@@ -1,0 +1,15 @@
+[
+    {
+      "username": "john_doe",
+      "email": "john@example.com",
+      "role": "Sales",
+      "ddi": "+123456789"
+    },
+    {
+      "username": "jane_smith",
+      "email": "jane@example.com",
+      "role": "Support",
+      "ddi": "+987654321"
+    }
+  ]
+  
